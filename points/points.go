@@ -2,6 +2,7 @@ package points
 
 import (
 	"bytes"
+	"encoding/binary"
 	"errors"
 	"fmt"
 	"io"
@@ -61,6 +62,36 @@ func (p *Points) WriteTo(w io.Writer) (n int64, err error) {
 	for _, d := range p.Data { // every metric point
 		c, err = w.Write([]byte(fmt.Sprintf("%s %v %v\n", p.Metric, d.Value, d.Timestamp)))
 		n += int64(c)
+		if err != nil {
+			return
+		}
+	}
+	return
+}
+
+func (p *Points) WriteBinaryTo(w io.Writer) (n int, err error) {
+	var buf [20]byte
+	var l, c int
+
+	l = binary.PutUvarint(buf[:], uint64(len(p.Metric)))
+	c, err = w.Write(buf[:l])
+	n += c
+	if err != nil {
+		return
+	}
+
+	c, err = w.Write([]byte(p.Metric))
+	n += c
+	if err != nil {
+		return
+	}
+
+	for _, d := range p.Data { // every metric point
+		binary.LittleEndian.PutUint64(buf[:], math.Float64bits(d.Value))
+		binary.LittleEndian.PutUint64(buf[8:], uint64(d.Timestamp))
+
+		c, err = w.Write([]byte(buf[:16]))
+		n += c
 		if err != nil {
 			return
 		}

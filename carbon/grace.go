@@ -60,7 +60,7 @@ func (app *App) DumpStop() error {
 	logger.Info("grace stop with dump inited")
 
 	filenamePostfix := fmt.Sprintf("%d.%d", os.Getpid(), time.Now().UnixNano())
-	dumpFilename := path.Join(app.Config.Dump.Path, fmt.Sprintf("cache.%s", filenamePostfix))
+	dumpFilename := path.Join(app.Config.Dump.Path, fmt.Sprintf("cache.%s.bin", filenamePostfix))
 	xlogFilename := path.Join(app.Config.Dump.Path, fmt.Sprintf("input.%s", filenamePostfix))
 
 	// start dumpers
@@ -88,7 +88,7 @@ func (app *App) DumpStop() error {
 	cacheSize := app.Cache.Size()
 
 	// dump cache
-	err = app.Cache.Dump(dumpWriter)
+	err = app.Cache.DumpBinary(dumpWriter)
 	if err != nil {
 		return err
 	}

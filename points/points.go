@@ -86,9 +86,17 @@ func (p *Points) WriteBinaryTo(w io.Writer) (n int, err error) {
 		return
 	}
 
-	for _, d := range p.Data { // every metric point
+	for index, d := range p.Data { // every metric point
 		binary.LittleEndian.PutUint64(buf[:], math.Float64bits(d.Value))
 		binary.LittleEndian.PutUint64(buf[8:], uint64(d.Timestamp))
+
+		if index > 0 {
+			c, err = w.Write([]byte{0x0})
+			n += c
+			if err != nil {
+				return
+			}
+		}
 
 		c, err = w.Write([]byte(buf[:16]))
 		n += c

@@ -265,12 +265,14 @@ func (c *Cache) DumpBinary(w io.Writer) error {
 				continue
 			}
 			if _, err := p.WriteBinaryTo(w); err != nil {
+				shard.Unlock()
 				return err
 			}
 		}
 
 		for _, p := range shard.items {
 			if _, err := p.WriteBinaryTo(w); err != nil {
+				shard.Unlock()
 				return err
 			}
 		}

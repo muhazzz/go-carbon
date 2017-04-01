@@ -4,7 +4,7 @@ import (
 	"encoding/binary"
 )
 
-var varintCacheSize int = 1000 // < should be lower then 16k
+var varintCacheSize int = 5000 // < should be lower then 16k
 var varintCache []byte
 
 func init() {
@@ -23,7 +23,7 @@ func encodeVarint(value int) []byte {
 		if value < 128 {
 			return varintCache[value : value+1]
 		}
-		return varintCache[value*2-128 : value+2]
+		return varintCache[value*2-128 : value*2-126]
 	}
 
 	var buf [10]byte

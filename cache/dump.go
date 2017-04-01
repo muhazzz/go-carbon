@@ -12,12 +12,14 @@ func (c *Cache) Dump(w io.Writer) error {
 				continue
 			}
 			if _, err := p.WriteTo(w); err != nil {
+				shard.Unlock()
 				return err
 			}
 		}
 
 		for _, p := range shard.items {
 			if _, err := p.WriteTo(w); err != nil {
+				shard.Unlock()
 				return err
 			}
 		}

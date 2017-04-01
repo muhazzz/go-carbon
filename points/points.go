@@ -69,8 +69,7 @@ func (p *Points) WriteTo(w io.Writer) (n int64, err error) {
 	return
 }
 
-func (p *Points) WriteBinaryTo(w io.Writer) (n int, err error) {
-	var buf [20]byte
+func (p *Points) WriteBinaryTo(w io.Writer, buf []byte) (n int, err error) {
 	var c int
 
 	c, err = w.Write(encodeVarint(len(p.Metric)))

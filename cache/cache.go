@@ -256,6 +256,8 @@ func (c *Cache) Dump(w io.Writer) error {
 }
 
 func (c *Cache) DumpBinary(w io.Writer) error {
+	var buf [20]byte
+
 	for i := 0; i < shardCount; i++ {
 		shard := c.data[i]
 		shard.Lock()
@@ -264,14 +266,14 @@ func (c *Cache) DumpBinary(w io.Writer) error {
 			if p == nil {
 				continue
 			}
-			if _, err := p.WriteBinaryTo(w); err != nil {
+			if _, err := p.WriteBinaryTo(w, buf[:]); err != nil {
 				shard.Unlock()
 				return err
 			}
 		}
 
 		for _, p := range shard.items {
-			if _, err := p.WriteBinaryTo(w); err != nil {
+			if _, err := p.WriteBinaryTo(w, buf[:]); err != nil {
 				shard.Unlock()
 				return err
 			}
